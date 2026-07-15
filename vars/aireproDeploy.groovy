@@ -10,7 +10,7 @@ def call(Map cfg) {
   def envName = cfg.environment ?: 'stage'
   def branch = cfg.branch ?: (envName == 'production' ? 'prod' : 'stage')
   def gitUrl = cfg.deploy?.git_url
-  def credId = cfg.deploy?.credentials_id ?: 'eliteprofessional'
+  def credId = cfg.deploy?.credentials_id ?: 'github-rajathakur'
   def backendScript = cfg.deploy?.deploy_backend_script ?: 'backend/scripts/docker_deploy.sh'
   def frontendScript = cfg.deploy?.deploy_frontend_script ?: 'hireFrontend/deploy-docker.sh'
   def backendDir = cfg.deploy?.backend_dir ?: 'backend'

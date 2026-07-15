@@ -41,8 +41,8 @@ pipelineJob('Airepro/seed-jobs') {
       scm {
         git {
           remote {
-            url('https://github.com/eliteprofessional/jenkins.git')
-            credentials('eliteprofessional')
+            url('https://github.com/rajathakurelite/airepro-cicd.git')
+            credentials('github-rajathakur')
           }
           branch('main')
         }
@@ -67,8 +67,8 @@ testAreas.each { area ->
         scm {
           git {
             remote {
-              url('https://github.com/eliteprofessional/jenkins.git')
-              credentials('eliteprofessional')
+              url('https://github.com/rajathakurelite/airepro-cicd.git')
+              credentials('github-rajathakur')
             }
             branch('main')
           }
@@ -87,8 +87,8 @@ pipelineJob('Airepro/deploy/hire-stage') {
       scm {
         git {
           remote {
-            url('https://github.com/eliteprofessional/jenkins.git')
-            credentials('eliteprofessional')
+            url('https://github.com/rajathakurelite/airepro-cicd.git')
+            credentials('github-rajathakur')
           }
           branch('main')
         }
@@ -105,8 +105,8 @@ pipelineJob('Airepro/deploy/hire-prod') {
       scm {
         git {
           remote {
-            url('https://github.com/eliteprofessional/jenkins.git')
-            credentials('eliteprofessional')
+            url('https://github.com/rajathakurelite/airepro-cicd.git')
+            credentials('github-rajathakur')
           }
           branch('main')
         }
@@ -130,8 +130,8 @@ pipelineJob('Airepro/release/hire-promote') {
       scm {
         git {
           remote {
-            url('https://github.com/eliteprofessional/jenkins.git')
-            credentials('eliteprofessional')
+            url('https://github.com/rajathakurelite/airepro-cicd.git')
+            credentials('github-rajathakur')
           }
           branch('main')
         }
@@ -152,8 +152,8 @@ pipelineJob('Airepro/orchestrators/nightly-regression') {
       scm {
         git {
           remote {
-            url('https://github.com/eliteprofessional/jenkins.git')
-            credentials('eliteprofessional')
+            url('https://github.com/rajathakurelite/airepro-cicd.git')
+            credentials('github-rajathakur')
           }
           branch('main')
         }

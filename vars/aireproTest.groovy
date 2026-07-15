@@ -11,11 +11,24 @@ def call(Map cfg) {
   def testRepo = cfg.test_repo ?: [
     git_url: 'https://github.com/eliteprofessional/airepro_cicd.git',
     branch: 'fixes_ai',
-    credentials_id: 'eliteprofessional',
+    credentials_id: 'github-rajathakur',
   ]
   def envName = cfg.env ?: cfg.environment ?: 'stage'
   def areas = cfg.areas ?: (cfg.test?.promote_areas ?: [cfg.test?.area ?: 'hire'])
   def apiOverride = cfg.api_base_url ?: cfg.test?.hire_api_base ?: ''
+
+  def areaPaths = [
+    hire: 'src/tests/hire',
+    security: 'src/tests/security',
+    ems: 'src/tests/EMS_service',
+    obo: 'src/tests/OBO',
+    email: 'src/tests/email',
+    blogging: 'src/tests/blogging',
+    lernify: 'src/tests/lernify',
+    timesheet: 'src/tests/timesheet',
+    feature_flag: 'src/tests/feature_flag',
+    other: 'src/tests/other',
+  ]
 
   stage('Checkout airepro_cicd') {
     dir('airepro_cicd') {
@@ -30,7 +43,7 @@ def call(Map cfg) {
         submoduleCfg: [],
         userRemoteConfigs: [[
           url: testRepo.git_url,
-          credentialsId: testRepo.credentials_id ?: 'eliteprofessional',
+          credentialsId: testRepo.credentials_id ?: 'github-rajathakur',
         ]],
       ])
     }
@@ -49,14 +62,24 @@ def call(Map cfg) {
 
   stage("Test on ${envName}") {
     dir('airepro_cicd') {
+      def defaultBaseUrl = envName == 'production'
+        ? 'https://vps.airepro.in/api/v1'
+        : 'https://server.airepro.in/api/v1'
+      def baseUrl = apiOverride?.trim() ?: defaultBaseUrl
+
       for (def area : areas) {
         if (!area) continue
-        def apiFlag = (apiOverride?.trim()) ? "--api-base-url=${apiOverride.trim()}" : ''
+        def testPath = areaPaths[area] ?: "src/tests/${area}"
+        def hireTarget = area == 'hire' ? 'hire' : 'other'
+        def runExternal = !['hire', 'security'].contains(area)
         sh """
           set -e
           . scripts/ci-setup-node.sh
           export CI=true
-          node scripts/run-service-tests.js --area=${area} --env=${envName} ${apiFlag}
+          export BASE_URL='${baseUrl}'
+          export HIRE_API_TARGET='${hireTarget}'
+          export RUN_EXTERNAL_TESTS='${runExternal}'
+          npx playwright test ${testPath}
         """
       }
     }

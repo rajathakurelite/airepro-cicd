@@ -37,7 +37,7 @@ Airepro/release/hire-promote
 | Default version | `main` |
 | Retrieval method | Modern SCM → Git |
 | Project repository | URL of **this** `jenkins` repo |
-| Credentials | `eliteprofessional` |
+| Credentials | `github-rajathakur` |
 
 The library loads `vars/aireproDeploy.groovy`, `vars/aireproTest.groovy`, `vars/aireproPromote.groovy`.
 
@@ -53,7 +53,7 @@ The library loads `vars/aireproDeploy.groovy`, `vars/aireproTest.groovy`, `vars/
 
 ### 4. Credentials
 
-- **`eliteprofessional`** — Git access to `airepro-stage`, `airepro_cicd`, `jenkins`
+- **`github-rajathakur`** — Git access to `airepro-stage`, `airepro_cicd`, `airepro-cicd`
 - SSH keys on agent for `hireFrontend/deploy-docker.sh` prod deploy (if used)
 
 ## Jobs created by seed

@@ -10,7 +10,7 @@ services:
       backend_dir: backend
       deploy_backend_script: backend/scripts/docker_deploy.sh
       deploy_frontend_script: hireFrontend/deploy-docker.sh
-      credentials_id: eliteprofessional
+      credentials_id: github-rajathakur
     environments:
       stage:
         branch: stage

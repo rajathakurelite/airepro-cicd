@@ -52,7 +52,7 @@ pipeline {
             test_repo: [
               git_url: 'https://github.com/eliteprofessional/airepro_cicd.git',
               branch: params.GIT_BRANCH,
-              credentials_id: 'eliteprofessional',
+              credentials_id: 'github-rajathakur',
             ],
           ])
         }

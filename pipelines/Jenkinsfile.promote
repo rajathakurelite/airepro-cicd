@@ -51,7 +51,7 @@ pipeline {
             "slug": "hire",
             "deploy": {
               "git_url": "https://github.com/eliteprofessional/airepro-stage.git",
-              "credentials_id": "eliteprofessional",
+              "credentials_id": "github-rajathakur",
               "backend_dir": "backend",
               "frontend_dir": "hireFrontend",
               "deploy_backend_script": "backend/scripts/docker_deploy.sh",
@@ -111,7 +111,7 @@ pipeline {
             test_repo: [
               git_url: 'https://github.com/eliteprofessional/airepro_cicd.git',
               branch: params.TEST_GIT_BRANCH,
-              credentials_id: 'eliteprofessional',
+              credentials_id: 'github-rajathakur',
             ],
           ])
         }
