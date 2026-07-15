@@ -1,0 +1,62 @@
+/**
+ * Run Playwright tests from airepro_cicd for one area against stage (default) or production.
+ */
+@Library('airepro-pipeline') _
+
+pipeline {
+  agent any
+
+  options {
+    timestamps()
+    timeout(time: 120, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '30'))
+  }
+
+  parameters {
+    choice(
+      name: 'TEST_AREA',
+      choices: ['hire', 'security', 'ems', 'obo', 'email', 'blogging', 'lernify', 'timesheet', 'feature_flag', 'other'],
+      description: 'Test area folder in airepro_cicd'
+    )
+    choice(
+      name: 'ENV',
+      choices: ['stage', 'production'],
+      description: 'stage → server.airepro.in/api/v1 for hire'
+    )
+    string(
+      name: 'GIT_BRANCH',
+      defaultValue: 'fixes_ai',
+      description: 'airepro_cicd branch'
+    )
+    string(
+      name: 'API_BASE_URL',
+      defaultValue: 'https://server.airepro.in/api/v1',
+      description: 'BASE_URL override (default: stage hire API)'
+    )
+    string(
+      name: 'REPEAT_COUNT',
+      defaultValue: '1',
+      description: 'Repeat 1–10'
+    )
+  }
+
+  stages {
+    stage('Test') {
+      steps {
+        script {
+          def repeat = Math.min(Math.max((params.REPEAT_COUNT ?: '1').toInteger(), 1), 10)
+          aireproTest([
+            env: params.ENV,
+            areas: [params.TEST_AREA],
+            api_base_url: params.API_BASE_URL?.trim() ?: '',
+            test_repo: [
+              git_url: 'https://github.com/eliteprofessional/airepro_cicd.git',
+              branch: params.GIT_BRANCH,
+              credentials_id: 'eliteprofessional',
+            ],
+          ])
+        }
+      }
+    }
+  }
+}

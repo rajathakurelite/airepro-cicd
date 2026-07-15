@@ -1,0 +1,51 @@
+@Library('airepro-pipeline') _
+
+pipeline {
+  agent any
+
+  options {
+    timestamps()
+    timeout(time: 120, unit: 'MINUTES')
+  }
+
+  parameters {
+    booleanParam(
+      name: 'CONFIRM_PROD',
+      defaultValue: false,
+      description: 'Check to confirm manual production deploy'
+    )
+  }
+
+  stages {
+    stage('Confirm') {
+      steps {
+        script {
+          if (!params.CONFIRM_PROD) {
+            error('Set CONFIRM_PROD=true to deploy production manually. Prefer Airepro/release/hire-promote.')
+          }
+        }
+      }
+    }
+
+    stage('Deploy Production') {
+      steps {
+        script {
+          aireproDeploy([
+            slug: 'hire',
+            deploy: [
+              git_url: 'https://github.com/eliteprofessional/airepro-stage.git',
+              credentials_id: 'eliteprofessional',
+              backend_dir: 'backend',
+              frontend_dir: 'hireFrontend',
+              deploy_backend_script: 'backend/scripts/docker_deploy.sh',
+              deploy_frontend_script: 'hireFrontend/deploy-docker.sh',
+            ],
+            environment: 'production',
+            branch: 'prod',
+            health_url: 'https://vps.airepro.in/api/v1/health',
+          ])
+        }
+      }
+    }
+  }
+}

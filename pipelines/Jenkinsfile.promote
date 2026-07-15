@@ -1,0 +1,145 @@
+/**
+ * Hire release: deploy airepro-stage @ stage → test on server.airepro.in → deploy @ prod
+ *
+ * Register jenkins repo as Global Pipeline Library (airepro-pipeline) OR use
+ * "Pipeline script from SCM" pointing at pipelines/Jenkinsfile.promote in this repo.
+ */
+@Library('airepro-pipeline') _
+
+pipeline {
+  agent any
+
+  options {
+    timestamps()
+    timeout(time: 180, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '30'))
+  }
+
+  parameters {
+    booleanParam(
+      name: 'SKIP_PRODUCTION',
+      defaultValue: false,
+      description: 'Deploy and test stage only — do not promote to production'
+    )
+    booleanParam(
+      name: 'SKIP_STAGE_GATE',
+      defaultValue: false,
+      description: 'Admin only: deploy prod without running stage tests (emergency)'
+    )
+    string(
+      name: 'TEST_GIT_BRANCH',
+      defaultValue: 'fixes_ai',
+      description: 'airepro_cicd branch for Playwright tests'
+    )
+    choice(
+      name: 'TEST_AREAS',
+      choices: ['hire', 'hire,security', 'all'],
+      description: 'Test areas to run on stage before promotion'
+    )
+  }
+
+  environment {
+    SERVICE_SLUG = 'hire'
+  }
+
+  stages {
+    stage('Load service config') {
+      steps {
+        script {
+          env.SERVICE_CONFIG = '''
+          {
+            "slug": "hire",
+            "deploy": {
+              "git_url": "https://github.com/eliteprofessional/airepro-stage.git",
+              "credentials_id": "eliteprofessional",
+              "backend_dir": "backend",
+              "frontend_dir": "hireFrontend",
+              "deploy_backend_script": "backend/scripts/docker_deploy.sh",
+              "deploy_frontend_script": "hireFrontend/deploy-docker.sh"
+            },
+            "environments": {
+              "stage": {
+                "branch": "stage",
+                "api_base_url": "https://server.airepro.in/api/v1",
+                "health_url": "https://server.airepro.in/api/v1/health"
+              },
+              "production": {
+                "branch": "prod",
+                "api_base_url": "https://vps.airepro.in/api/v1",
+                "health_url": "https://vps.airepro.in/api/v1/health"
+              }
+            },
+            "test": {
+              "area": "hire",
+              "hire_api_base": "https://server.airepro.in/api/v1"
+            }
+          }
+          '''
+        }
+      }
+    }
+
+    stage('Deploy Stage') {
+      when {
+        expression { !params.SKIP_STAGE_GATE }
+      }
+      steps {
+        script {
+          def cfg = readJSON text: env.SERVICE_CONFIG
+          aireproDeploy(cfg + [environment: 'stage', branch: 'stage'])
+        }
+      }
+    }
+
+    stage('Test on Stage') {
+      when {
+        expression { !params.SKIP_STAGE_GATE }
+      }
+      steps {
+        script {
+          def cfg = readJSON text: env.SERVICE_CONFIG
+          def areas = params.TEST_AREAS == 'all'
+            ? ['hire', 'security', 'ems', 'obo', 'email', 'blogging']
+            : params.TEST_AREAS.split(',').collect { it.trim() }
+
+          aireproTest([
+            deploy: cfg.deploy,
+            test: cfg.test,
+            env: 'stage',
+            api_base_url: cfg.environments.stage.api_base_url,
+            areas: areas,
+            test_repo: [
+              git_url: 'https://github.com/eliteprofessional/airepro_cicd.git',
+              branch: params.TEST_GIT_BRANCH,
+              credentials_id: 'eliteprofessional',
+            ],
+          ])
+        }
+      }
+    }
+
+    stage('Deploy Production') {
+      when {
+        allOf {
+          expression { !params.SKIP_PRODUCTION }
+          expression { params.SKIP_STAGE_GATE || currentBuild.currentResult == null || currentBuild.currentResult == 'SUCCESS' }
+        }
+      }
+      steps {
+        script {
+          def cfg = readJSON text: env.SERVICE_CONFIG
+          aireproDeploy(cfg + [environment: 'production', branch: 'prod'])
+        }
+      }
+    }
+  }
+
+  post {
+    success {
+      echo 'Release pipeline completed successfully.'
+    }
+    failure {
+      echo 'Release failed — production was NOT deployed (unless SKIP_STAGE_GATE was used).'
+    }
+  }
+}

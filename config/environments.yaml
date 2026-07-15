@@ -1,0 +1,16 @@
+# Stage vs production — branches and Hire API URLs
+environments:
+  stage:
+    branch: stage
+    frontend_url: https://stage.airepro.in
+    hire_api_base: https://server.airepro.in/api/v1
+    health_url: https://server.airepro.in/api/v1/health
+    run_full_test_suite: true
+
+  production:
+    branch: prod
+    frontend_url: https://vps.airepro.in
+    hire_api_base: https://vps.airepro.in/api/v1
+    health_url: https://vps.airepro.in/api/v1/health
+    run_full_test_suite: false
+    requires_stage_pass: true

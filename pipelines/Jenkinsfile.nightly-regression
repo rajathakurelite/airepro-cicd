@@ -1,0 +1,78 @@
+/**
+ * Nightly: run all airepro_cicd test areas against stage backend (server.airepro.in).
+ */
+@Library('airepro-pipeline') _
+
+pipeline {
+  agent any
+
+  options {
+    timestamps()
+    timeout(time: 240, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '14'))
+  }
+
+  parameters {
+    string(
+      name: 'GIT_BRANCH',
+      defaultValue: 'fixes_ai',
+      description: 'airepro_cicd branch'
+    )
+    booleanParam(
+      name: 'DEPLOY_STAGE_FIRST',
+      defaultValue: false,
+      description: 'Deploy airepro-stage @ stage before running tests'
+    )
+  }
+
+  stages {
+    stage('Deploy Stage (optional)') {
+      when {
+        expression { params.DEPLOY_STAGE_FIRST }
+      }
+      steps {
+        script {
+          aireproDeploy([
+            slug: 'hire',
+            deploy: [
+              git_url: 'https://github.com/eliteprofessional/airepro-stage.git',
+              credentials_id: 'eliteprofessional',
+              backend_dir: 'backend',
+              frontend_dir: 'hireFrontend',
+              deploy_backend_script: 'backend/scripts/docker_deploy.sh',
+              deploy_frontend_script: 'hireFrontend/deploy-docker.sh',
+            ],
+            environment: 'stage',
+            branch: 'stage',
+            health_url: 'https://server.airepro.in/api/v1/health',
+          ])
+        }
+      }
+    }
+
+    stage('Run all test areas') {
+      steps {
+        script {
+          def areas = ['hire', 'security', 'ems', 'obo', 'email', 'blogging', 'lernify', 'timesheet', 'feature_flag']
+          def parallelStages = [:]
+          for (def area : areas) {
+            def areaName = area
+            parallelStages[areaName] = {
+              aireproTest([
+                env: 'stage',
+                areas: [areaName],
+                api_base_url: areaName == 'hire' ? 'https://server.airepro.in/api/v1' : '',
+                test_repo: [
+                  git_url: 'https://github.com/eliteprofessional/airepro_cicd.git',
+                  branch: params.GIT_BRANCH,
+                  credentials_id: 'eliteprofessional',
+                ],
+              ])
+            }
+          }
+          parallel parallelStages
+        }
+      }
+    }
+  }
+}

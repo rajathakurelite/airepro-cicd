@@ -1,0 +1,18 @@
+# All Playwright tests live in airepro_cicd — every test job clones this repo
+test_repo:
+  git_url: https://github.com/eliteprofessional/airepro_cicd.git
+  branch: fixes_ai
+  credentials_id: eliteprofessional
+  install_script: scripts/ci-setup-node.sh
+  run_script: scripts/run-service-tests.js
+  default_env: stage
+
+# Deploy repos use this credential unless overridden per service
+deploy:
+  credentials_id: eliteprofessional
+
+# Jenkins infra repo (this repo) — for pipeline script from SCM
+infra_repo:
+  git_url: https://github.com/eliteprofessional/jenkins.git
+  branch: main
+  credentials_id: eliteprofessional

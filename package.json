@@ -1,0 +1,9 @@
+{
+  "name": "airepro-jenkins",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync-test-areas": "node scripts/sync-test-areas.mjs",
+    "validate": "node scripts/validate-catalog.js"
+  }
+}

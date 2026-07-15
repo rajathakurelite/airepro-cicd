@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-07-05T14:50:28.179Z",
+  "areas": [
+    {
+      "id": "hire",
+      "label": "Hire",
+      "testPath": "src/tests/hire",
+      "external": false
+    },
+    {
+      "id": "security",
+      "label": "Security",
+      "testPath": "src/tests/security",
+      "external": false
+    },
+    {
+      "id": "ems",
+      "label": "EMS",
+      "testPath": "src/tests/EMS_service",
+      "external": true
+    },
+    {
+      "id": "obo",
+      "label": "OBO",
+      "testPath": "src/tests/OBO",
+      "external": true
+    },
+    {
+      "id": "email",
+      "label": "Email",
+      "testPath": "src/tests/email",
+      "external": true
+    },
+    {
+      "id": "blogging",
+      "label": "Blogging",
+      "testPath": "src/tests/blogging",
+      "external": true
+    },
+    {
+      "id": "lernify",
+      "label": "Lernify",
+      "testPath": "src/tests/lernify",
+      "external": true
+    },
+    {
+      "id": "timesheet",
+      "label": "Timesheet",
+      "testPath": "src/tests/Timesheet",
+      "external": true
+    },
+    {
+      "id": "feature_flag",
+      "label": "Feature Flag",
+      "testPath": "src/tests/Feature_flag",
+      "external": true
+    },
+    {
+      "id": "other",
+      "label": "Other",
+      "testPath": "src/tests/test.test.js",
+      "external": false
+    }
+  ]
+}

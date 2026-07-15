@@ -1,0 +1,58 @@
+# Service catalog — deploy repos linked to airepro_cicd test areas
+services:
+  - slug: hire
+    display_name: Hire Platform
+    enabled: true
+    deploy:
+      git_url: https://github.com/eliteprofessional/airepro-stage.git
+      layout: dual_folder
+      frontend_dir: hireFrontend
+      backend_dir: backend
+      deploy_backend_script: backend/scripts/docker_deploy.sh
+      deploy_frontend_script: hireFrontend/deploy-docker.sh
+      credentials_id: eliteprofessional
+    environments:
+      stage:
+        branch: stage
+        frontend_url: https://stage.airepro.in
+        api_base_url: https://server.airepro.in/api/v1
+        health_url: https://server.airepro.in/api/v1/health
+      production:
+        branch: prod
+        frontend_url: https://vps.airepro.in
+        api_base_url: https://vps.airepro.in/api/v1
+        health_url: https://vps.airepro.in/api/v1/health
+    test:
+      area: hire
+      run_on: stage
+      hire_api_base: https://server.airepro.in/api/v1
+      promote_areas:
+        - hire
+
+  # Additional services — enable and set git_url when ready
+  - slug: ems
+    display_name: EMS
+    enabled: false
+    deploy:
+      git_url: https://github.com/eliteprofessional/ems-server.git
+      layout: monorepo
+    test:
+      area: ems
+
+  - slug: obo
+    display_name: OBO
+    enabled: false
+    deploy:
+      git_url: https://github.com/eliteprofessional/obo_backend.git
+      layout: monorepo
+    test:
+      area: obo
+
+  - slug: payment-airepro
+    display_name: Payment
+    enabled: false
+    deploy:
+      git_url: https://github.com/eliteprofessional/payment-airepro.git
+      layout: monorepo
+    test:
+      area: null
