@@ -55,7 +55,8 @@ def call(Map cfg) {
         set -e
         . scripts/ci-setup-node.sh
         npm ci
-        npx playwright install-deps
+        # Hire/API Playwright tests do not need Chromium OS packages.
+        # install-deps uses sudo and fails this Jenkins agent (test-hire #6/#7).
       '''
     }
   }
