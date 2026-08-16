@@ -65,7 +65,7 @@ def call(Map cfg) {
     dir('airepro_cicd') {
       def defaultBaseUrl = envName == 'production'
         ? 'https://vps.airepro.in/api/v1'
-        : 'https://server.airepro.in/api/v1'
+        : 'https://prodhirebe.airepro.in/api/v1'
       def baseUrl = apiOverride?.trim() ?: defaultBaseUrl
 
       for (def area : areas) {
