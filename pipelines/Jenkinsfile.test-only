@@ -36,6 +36,11 @@ pipeline {
       ],
       description: 'Hire API host. Default: https://prodhirebe.airepro.in/api/v1'
     )
+    choice(
+      name: 'TEST_PROFILE',
+      choices: ['all', 'smoke', 'flaky', 'journey'],
+      description: 'all = every Hire test (default). smoke = @hire:smoke only.'
+    )
     string(
       name: 'REPEAT_COUNT',
       defaultValue: '1',
@@ -52,6 +57,7 @@ pipeline {
             env: params.ENV,
             areas: [params.TEST_AREA],
             api_base_url: params.API_BASE_URL?.trim() ?: '',
+            test_profile: params.TEST_PROFILE,
             test_repo: [
               git_url: 'https://github.com/eliteprofessional/airepro_cicd.git',
               branch: params.GIT_BRANCH,

@@ -16,6 +16,7 @@ def call(Map cfg) {
   def envName = cfg.env ?: cfg.environment ?: 'stage'
   def areas = cfg.areas ?: (cfg.test?.promote_areas ?: [cfg.test?.area ?: 'hire'])
   def apiOverride = cfg.api_base_url ?: cfg.test?.hire_api_base ?: ''
+  def testProfile = cfg.test_profile ?: 'all'
 
   def areaPaths = [
     hire: 'src/tests/hire',
@@ -73,6 +74,22 @@ def call(Map cfg) {
         def testPath = areaPaths[area] ?: "src/tests/${area}"
         def hireTarget = area == 'hire' ? 'hire' : 'other'
         def runExternal = !['hire', 'security'].contains(area)
+        def grepFlag = ''
+        def grepInvertFlag = ''
+        def runFlaky = 'false'
+        if (area == 'hire') {
+          runFlaky = (testProfile == 'all' || testProfile == 'flaky' || testProfile == 'journey') ? 'true' : 'false'
+          if (testProfile == 'smoke') {
+            grepFlag = '--grep @hire:smoke'
+          } else if (testProfile == 'flaky') {
+            grepFlag = '--grep @hire:flaky'
+          } else if (testProfile == 'journey') {
+            grepFlag = '--grep @hire:journey'
+          }
+          if (testProfile == 'all') {
+            grepInvertFlag = '--grep-invert @hire:manual'
+          }
+        }
         sh """
           set -e
           . scripts/ci-setup-node.sh
@@ -80,7 +97,9 @@ def call(Map cfg) {
           export BASE_URL='${baseUrl}'
           export HIRE_API_TARGET='${hireTarget}'
           export RUN_EXTERNAL_TESTS='${runExternal}'
-          npx playwright test ${testPath}
+          export HIRE_TEST_PROFILE='${testProfile}'
+          export RUN_FLAKY_HIRE_TESTS='${runFlaky}'
+          npx playwright test ${testPath} ${grepFlag} ${grepInvertFlag}
         """
       }
     }

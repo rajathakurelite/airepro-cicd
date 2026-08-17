@@ -64,6 +64,7 @@ testAreas.each { area ->
         'https://prodhirebe.airepro.in/api/v1',
         'https://server.airepro.in/api/v1',
       ], 'Hire API host (default: prodhirebe)')
+      choiceParam('TEST_PROFILE', ['all', 'smoke', 'flaky', 'journey'], 'all = every Hire test (default)')
     }
     definition {
       cpsScm {
