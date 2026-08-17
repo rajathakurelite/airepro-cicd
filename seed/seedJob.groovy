@@ -55,12 +55,15 @@ pipelineJob('Airepro/seed-jobs') {
 // Test jobs — one per airepro_cicd area
 testAreas.each { area ->
   pipelineJob("Airepro/test/${area.id}") {
-    description("Run ${area.label} Playwright tests from airepro_cicd (default: stage / server.airepro.in)")
+    description("Run ${area.label} Playwright tests from airepro_cicd (default: prodhirebe.airepro.in)")
     parameters {
       choiceParam('TEST_AREA', [area.id], 'Test area (fixed for this job)')
       choiceParam('ENV', ['stage', 'production'], 'Test environment')
       stringParam('GIT_BRANCH', 'fixes_ai', 'airepro_cicd branch')
-      stringParam('API_BASE_URL', area.id == 'hire' ? 'https://server.airepro.in/api/v1' : '', 'BASE_URL override')
+      choiceParam('API_BASE_URL', [
+        'https://prodhirebe.airepro.in/api/v1',
+        'https://server.airepro.in/api/v1',
+      ], 'Hire API host (default: prodhirebe)')
     }
     definition {
       cpsScm {

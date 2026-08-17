@@ -21,17 +21,20 @@ pipeline {
     choice(
       name: 'ENV',
       choices: ['stage', 'production'],
-      description: 'stage → server.airepro.in/api/v1 for hire'
+      description: 'stage uses API_BASE_URL; production defaults to vps if API_BASE_URL is unused'
     )
     string(
       name: 'GIT_BRANCH',
       defaultValue: 'fixes_ai',
       description: 'airepro_cicd branch'
     )
-    string(
+    choice(
       name: 'API_BASE_URL',
-      defaultValue: 'https://server.airepro.in/api/v1',
-      description: 'BASE_URL override (default: stage hire API)'
+      choices: [
+        'https://prodhirebe.airepro.in/api/v1',
+        'https://server.airepro.in/api/v1',
+      ],
+      description: 'Hire API host. Default: https://prodhirebe.airepro.in/api/v1'
     )
     string(
       name: 'REPEAT_COUNT',
